@@ -1,0 +1,104 @@
+{
+  "apiVersion": 1,
+  "groups": [
+    {
+      "name": "alertas_fwhq",
+      "folder": "FWHQ - Alertas",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "cpu_usage_high",
+          "title": "🚨 CPU Alta en Nodo",
+          "condition": "A",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "instant",
+              "datasourceUid": "aek0zopotbv9ce",
+              "expr": "avg by (instance) (rate(node_cpu_seconds_total{mode!='idle'}[5m])) * 100",
+              "legendFormat": "{{instance}}"
+            }
+          ],
+          "for": "2m",
+          "annotations": {
+            "summary": "🚨 CPU alta en {{ $labels.instance }}",
+            "description": "El uso de CPU superó el 85% en {{ $labels.instance }}."
+          },
+          "labels": {
+            "tipo": "cpu",
+            "severity": "critical"
+          }
+        },
+        {
+          "uid": "ram_usage_high",
+          "title": "🧠 RAM Alta en Nodo",
+          "condition": "A",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "instant",
+              "datasourceUid": "aek0zopotbv9ce",
+              "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+              "legendFormat": "{{instance}}"
+            }
+          ],
+          "for": "2m",
+          "annotations": {
+            "summary": "🧠 RAM alta en {{ $labels.instance }}",
+            "description": "El consumo de RAM superó el 80% en {{ $labels.instance }}."
+          },
+          "labels": {
+            "tipo": "ram",
+            "severity": "warning"
+          }
+        },
+        {
+          "uid": "disk_usage_high",
+          "title": "💾 DISK Uso Alto en Nodo",
+          "condition": "A",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "instant",
+              "datasourceUid": "aek0zopotbv9ce",
+              "expr": "(1 - (node_filesystem_avail_bytes{mountpoint='/'}/node_filesystem_size_bytes{mountpoint='/'})) * 100",
+              "legendFormat": "{{instance}} {{mountpoint}}"
+            }
+          ],
+          "for": "2m",
+          "annotations": {
+            "summary": "💾 Disco casi lleno en {{ $labels.instance }}",
+            "description": "El disco principal (/) superó el 90% en {{ $labels.instance }}."
+          },
+          "labels": {
+            "tipo": "disk",
+            "severity": "warning"
+          }
+        },
+        {
+          "uid": "node_down",
+          "title": "❌ Nodo DOWN",
+          "condition": "A",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "instant",
+              "datasourceUid": "aek0zopotbv9ce",
+              "expr": "up == 0",
+              "legendFormat": "{{instance}}"
+            }
+          ],
+          "for": "1m",
+          "annotations": {
+            "summary": "❌ Nodo {{ $labels.instance }} caído",
+            "description": "El nodo {{ $labels.instance }} no está respondiendo. Verificar conectividad."
+          },
+          "labels": {
+            "tipo": "node",
+            "severity": "critical"
+          }
+        }
+      ]
+    }
+  ]
+}
